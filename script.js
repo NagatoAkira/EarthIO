@@ -553,7 +553,7 @@ let counter = 0
 
 let stars =  new Stars()
 
-let buildings = new backgroundElement(-canvas.width*0.27,-canvas.width*0.95+canvas.height,"assets\\buildings\\Buildings.png",canvas.width*1.5)
+let buildings = new backgroundElement(-canvas.width*0.27,-canvas.width*0.95+canvas.height,"assets\\buildings\\buildings.png",canvas.width*1.5)
 let ground = new backgroundElement(0,canvas.height-canvas.width*0.07, "assets\\ground\\ground.svg", canvas.width)
 let trash01 = new backgroundElement(-canvas.width*0.015,canvas.height-canvas.width/5, "assets\\trash\\Trash01.png", canvas.width/5)
 let trash02 = new backgroundElement(canvas.width*0.85,canvas.height-canvas.width/5, "assets\\trash\\Trash02.png", canvas.width/5)
