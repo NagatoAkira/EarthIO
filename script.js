@@ -606,10 +606,9 @@ function animate () {
     spawn_squares.append(new Square((Math.random()+0.15)*(canvas.width*(1-0.15)),-50,85))
     square_counter = 0
     }
-
-    spawn_squares.update()
     square_counter += 1
 	}
+	spawn_squares.update()
 
 	camera.save()
     camera.load()
