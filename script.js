@@ -411,12 +411,15 @@ class Planet{
 }
 
 class Camera{
-	constructor(backgroundObjects, stars, squares){
+	constructor(backgroundObjects, stars, squares, main, guard){
 		this.backgroundObjects = backgroundObjects
 		this.speed = 0.2
 		
 		this.stars = stars
 		this.squares = squares
+
+		this.main = main
+		this.guard = guard
 
 		this.save()
 	}
@@ -446,9 +449,13 @@ class Camera{
 			this.squares.squares[index].x += rand_vector.x
 			this.squares.squares[index].y += rand_vector.y
 		}
+		this.main.x += rand_vector.x
+		this.main.y += rand_vector.y
+		this.guard.mouse_move_position[0] += rand_vector.x
+		this.guard.mouse_move_position[1] += rand_vector.y
 	}
 	save(){
-		this.saved = {backgroundObjects: {x:[], y:[]}, stars:[]}
+		this.saved = {backgroundObjects: {x:[], y:[]}, stars:[], main:{x:0, y:0}, guard:{x:0, y:0}}
 		for(let index in this.backgroundObjects){
 			this.saved.backgroundObjects.x.push(this.backgroundObjects[index].x)
 			this.saved.backgroundObjects.y.push(this.backgroundObjects[index].y)
@@ -456,6 +463,8 @@ class Camera{
 		for(let index in this.stars.positions){
 			this.saved.stars.push(this.stars.positions[index])
 		}
+		this.saved.main = {x:this.main.x, y:this.main.y}
+		this.saved.guard = {x: this.guard.mouse_move_position[0], y:this.guard.mouse_move_position[1]} 
 	}
 
 	load(){
@@ -466,6 +475,10 @@ class Camera{
 		for(let index in this.saved.stars){
 			this.stars.positions[index] = this.saved.stars[index]
 		}
+		this.main.x = this.saved.main.x
+		this.main.y = this.saved.main.y
+		this.guard.mouse_move_position[0] = this.saved.guard.x
+		this.guard.mouse_move_position[1] = this.saved.guard.y
 	}
 	
 	accelerate(){
@@ -558,9 +571,9 @@ let ground = new backgroundElement(0,canvas.height-canvas.width*0.07, "assets\\g
 let trash01 = new backgroundElement(-canvas.width*0.015,canvas.height-canvas.width/5, "assets\\trash\\Trash01.png", canvas.width/5)
 let trash02 = new backgroundElement(canvas.width*0.85,canvas.height-canvas.width/5, "assets\\trash\\Trash02.png", canvas.width/5)
 
-let main = new Planet(canvas.width/2-canvas.width/8, canvas.height*0.6, "assets\\main\\Main.png", canvas.width/4)
+let main = new Planet(canvas.width/2-canvas.width/8, canvas.height*0.95-canvas.width/4, "assets\\main\\Main.png", canvas.width/4)
 
-let camera = new Camera([buildings, ground, trash01, trash02], stars = stars, squares = spawn_squares)
+let camera = new Camera([buildings, ground, trash01, trash02], stars = stars, squares = spawn_squares, main, ball)
 stars.generate(1)
 
 
@@ -620,5 +633,5 @@ function animate () {
  animate()
 
  canvas.addEventListener("mousemove", function (event) {
-  	ball.MouseMoveDefinePosition(event) 
+  	ball.MouseMoveDefinePosition(event)
 })
