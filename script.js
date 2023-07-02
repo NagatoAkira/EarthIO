@@ -518,12 +518,12 @@ class GameOver{
 		if(this.text01_opacity < 1){
 			this.text01_opacity += 0.01
 		}
+		}
 		ctx.globalAlpha = this.text01_opacity
 		ctx.fillStyle = "#B41875"
 		ctx.font = "50px Orbitron"
 		ctx.fillText("Game Over", canvas.width/2-50*3, canvas.height/2-50)
 		ctx.globalAlpha = 1
-		}
 		}
 	}
 	text02(final_points){
