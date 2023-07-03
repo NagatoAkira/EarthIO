@@ -99,23 +99,27 @@ class Square{
 			if(index<2){
 				continue
 			}
+			this.collision_points.push({x:this.square[index].x, y:this.square[index].y})
 			this.collision_points.push({x:this.square[index].x + (this.square[index-1].x-this.square[index].x)/3,
 										y:this.square[index].y + (this.square[index-1].y-this.square[index].y)/3})
 			this.collision_points.push({x:this.square[index].x + (this.square[index-1].x-this.square[index].x)/3*2,
 										y:this.square[index].y + (this.square[index-1].y-this.square[index].y)/3*2})
 		}
 		let max = this.square.length-1
+		this.collision_points.push({x:this.square[1].x, y:this.square[1].y})
 		this.collision_points.push({x:this.square[max].x + (this.square[1].x-this.square[max].x)/3,
 									y:this.square[max].y + (this.square[1].y-this.square[max].y)/3})
 		this.collision_points.push({x:this.square[max].x + (this.square[1].x-this.square[max].x)/3*2,
 									y:this.square[max].y + (this.square[1].y-this.square[max].y)/3*2})
+		//this.gizmos_collision_point(){
 
-		//this.gizmos_collision_point()
 	}
 	gizmos_collision_point(){
 		for(let index in this.collision_points){
 			ctx.beginPath()
-			ctx.arc(this.collision_points[index].x, this.collision_points[index].y, 20, 0, Math.PI*2)
+			ctx.strokeStyle = "#FFFFFF"
+			ctx.lineWidth = 8
+			ctx.arc(this.collision_points[index].x, this.collision_points[index].y, 5, 0, Math.PI*2)
 			ctx.stroke()
 		}
 	}
@@ -193,24 +197,20 @@ class Square{
 		return [vector[0]/this.distance(pos01, pos02), vector[1]/this.distance(pos01, pos02)]
 	}
 	square_collision(all_squares){
+		if(this.velocity != 0 && this.velocity != 0){
 		for(let square in all_squares){
 			if(all_squares[square]==this){
 				continue
 			}
 			let dir = this.normalize([this.square[0].x, this.square[0].y], [all_squares[square].square[0].x, all_squares[square].square[0].y])
+			dir = this.normalize([0,0], [this.velocity.x, this.velocity.y])
 			let counter = 0
 			for(let point in all_squares[square].collision_points){
 				if(this.collision_2d_detect([all_squares[square].collision_points[point].x, all_squares[square].collision_points[point].y])){
-					while(this.collision_2d_detect([all_squares[square].collision_points[point].x, all_squares[square].collision_points[point].y])){
-						this.x -= dir[0] * counter
-						this.y -= dir[1] * counter
-						this.update()
-						counter += 1
-					}
-					this.velocity.x = -dir[0]
-					this.velocity.y = -dir[1]
+					all_squares[square].velocity = this.velocity
 			}
 		  }
+		}
 		}
 	}
 
@@ -267,10 +267,17 @@ class Square{
 }
 
 class spawnSquares{
-	constructor(ball, game_over){
+	constructor(ball, game_over, fps){
+		this.fps = fps
+
 		this.squares = []
 		this.ball = ball
 		this.game_over = game_over
+
+		this.spawn_speed = 2
+		this.difficult_up_period = 10
+		this.spawn_timer_difficult_up = 0
+
 	}
 	append(square){
 		this.squares.push(square)
@@ -293,6 +300,20 @@ class spawnSquares{
 			delete this.squares[index]
 			this.game_over.state = true
 		}
+	}
+	difficulty_up(){
+		if(this.spawn_timer_difficult_up >= this.difficult_up_period*this.fps){
+			if(this.spawn_speed > 0.15){
+			this.spawn_speed -= 0.125
+			}
+			for(let index in this.squares){
+				if(this.squares[index].gravity < 10){
+				this.squares[index].gravity += 0.5
+				}
+			}
+			this.spawn_timer_difficult_up = 0
+		}
+		this.spawn_timer_difficult_up += 1
 	}
 
 }
@@ -559,7 +580,7 @@ let ball = new Ball(150,150,60)
 let game_over = new GameOver(fps=60)
 let final_points = 0
 
-let spawn_squares = new spawnSquares(ball, game_over)
+let spawn_squares = new spawnSquares(ball, game_over, fps)
 
 let square_counter = 0
 let counter = 0
@@ -571,7 +592,7 @@ let ground = new backgroundElement(0,canvas.height-canvas.width*0.07, "assets\\g
 let trash01 = new backgroundElement(-canvas.width*0.015,canvas.height-canvas.width/5, "assets\\trash\\Trash01.png", canvas.width/5)
 let trash02 = new backgroundElement(canvas.width*0.85,canvas.height-canvas.width/5, "assets\\trash\\Trash02.png", canvas.width/5)
 
-let main = new Planet(canvas.width/2-canvas.width/8, canvas.height*0.95-canvas.width/4, "assets\\main\\Main.png", canvas.width/4)
+let main = new Planet(canvas.width/2-150, canvas.height*0.95-250, "assets\\main\\Main.png", 300)
 
 let camera = new Camera([buildings, ground, trash01, trash02], stars = stars, squares = spawn_squares, main, ball)
 stars.generate(1)
@@ -602,7 +623,8 @@ function animate () {
     counter += 1
 
     if(!game_over.state){
-    if(square_counter >= fps*5){
+    spawn_squares.difficulty_up()
+    if(square_counter >= fps*spawn_squares.spawn_speed){
     spawn_squares.append(new Square((Math.random()+0.15)*(canvas.width*(1-0.15)),-50,85))
     square_counter = 0
     }
