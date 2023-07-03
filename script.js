@@ -202,13 +202,13 @@ class Square{
 			for(let point in all_squares[square].collision_points){
 				if(this.collision_2d_detect([all_squares[square].collision_points[point].x, all_squares[square].collision_points[point].y])){
 					while(this.collision_2d_detect([all_squares[square].collision_points[point].x, all_squares[square].collision_points[point].y])){
-						this.x = all_squares[square].square[0].x - dir[0]*(this.scale-this.rect_define)*0.5 - dir[0] * counter
-						this.y = all_squares[square].square[0].y - dir[1]*(this.scale-this.rect_define)*0.5 - dir[1] * counter
+						this.x -= dir[0] * counter
+						this.y -= dir[1] * counter
 						this.update()
-						counter += 0.5
+						counter += 1
 					}
-					this.velocity.x = dir[0]
-					this.velocity.y = dir[1]
+					this.velocity.x = -dir[0]
+					this.velocity.y = -dir[1]
 			}
 		  }
 		}
